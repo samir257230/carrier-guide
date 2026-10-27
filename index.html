@@ -4,8 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#10251f" />
-  <meta name="description" content="CareerGuide helps students explore colleges through student experiences, academic and research insights, campus life, and peer mentorship." />
-  <title>CareerGuide — Choose with clarity</title>
+  <meta name="description" content="Campus Guide helps students compare Indian central universities, IITs and NITs using academic information and current-student experiences." />
+  <title>Campus Guide — Choose with clarity</title>
+  <link rel="icon" href="campus-guide-logo.jpeg" type="image/jpeg" />
   <style>
     :root {
       --ink: #172722;
@@ -33,12 +34,16 @@
     header { position: sticky; top: 0; z-index: 20; backdrop-filter: blur(15px); background: rgba(247,248,243,.9); border-bottom: 1px solid rgba(228,233,225,.8); }
     .nav { min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
     .brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 850; letter-spacing: -.04em; font-size: 21px; white-space: nowrap; }
-    .brand-mark { <img
-  class="brand-logo"
-  src="logo.png"
-  alt="CareerGuide Logo"
-/>; }
-    .brand-mark svg { width: 20px; height: 20px; }
+    .brand-logo {
+      flex: 0 0 52px;
+      width: 52px;
+      height: 52px;
+      display: inline-block;
+      border-radius: 13px;
+      object-fit: contain;
+      background: #f3eee5;
+      border: 1px solid rgba(20, 38, 29, .08);
+    }
     .brand span span { color: #6d8b3c; }
     .nav-links { display: flex; align-items: center; gap: 26px; color: #56635d; font-size: 13px; font-weight: 650; }
     .nav-links a:hover { color: var(--green); }
@@ -274,6 +279,24 @@
       .footer-bottom { display: block; line-height: 1.8; }
     }
     @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *:before, *:after { transition: none !important; } }
+
+    /* Campus Guide additions */
+    .brand-logo { background-image: none !important; }
+    .brand { gap: 9px; }
+    .brand > span:last-child { line-height: 1; }
+    .brand > span:last-child span { color: var(--green-2, #648044); }
+    .filter-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .filter-grid .field:first-child { grid-column: span 2; }
+    .current-user-label { color: var(--green); font-size: 11px; font-weight: 800; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    [hidden] { display: none !important; }
+    .form-message.error { background: #fff0ee; color: #922e23; }
+    .auth-step-help { color: #738077; font-size: 11px; line-height: 1.6; margin: 0; }
+    .directory-tag { display: inline-flex; align-items: center; border-radius: 100px; padding: 5px 8px; background: #f2f4ec; color: #52644d; font-size: 9px; font-weight: 850; letter-spacing: .05em; }
+    .college-summary { color: #69776d; font-size: 11px; line-height: 1.65; margin-top: 7px; }
+    .missing-data { color: #829087; font-size: 10px; font-weight: 600; }
+    @media (max-width: 980px) { .filter-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .filter-grid .field:first-child { grid-column: span 3; } }
+    @media (max-width: 720px) { .filter-grid { grid-template-columns: 1fr 1fr; } .filter-grid .field:first-child { grid-column: span 2; } .current-user-label { display: none; } .brand-logo { width: 44px; height: 44px; flex-basis: 44px; } }
+
   </style>
 </head>
 <body>
@@ -281,9 +304,9 @@
   <header>
     <div class="container">
       <nav class="nav" aria-label="Main navigation">
-        <a class="brand" href="#home" aria-label="CareerGuide home">
-          <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 17.5 9.2 5l3.1 7 2-4.2L20 19" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 19h13" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg></span>
-          <span>Career<span>Guide</span></span>
+        <a class="brand" href="#home" aria-label="Campus Guide home">
+          <img class="brand-logo" src="campus-guide-logo.jpeg" alt="Campus Guide logo" />
+          <span>Campus <span>Guide</span></span>
         </a>
         <div class="nav-links">
           <a href="#explore">Explore colleges</a>
@@ -292,8 +315,10 @@
           <a href="#feedback">Student feedback</a>
         </div>
         <div class="nav-actions">
-          <button class="btn btn-outline btn-small" data-open-modal="login">Log in</button>
-          <button class="btn btn-primary btn-small" data-open-modal="signup">Get started <span aria-hidden="true">↗</span></button>
+          <button class="btn btn-outline btn-small" id="authLoginBtn" data-open-modal="login">Log in</button>
+          <button class="btn btn-primary btn-small" id="authSignupBtn" data-open-modal="signup">Get started <span aria-hidden="true">↗</span></button>
+          <span id="currentUserLabel" class="current-user-label" hidden></span>
+          <button class="btn btn-outline btn-small" id="logoutBtn" type="button" hidden>Log out</button>
           <button class="mobile-menu" id="mobileMenuBtn" aria-label="Open menu" aria-expanded="false">☰</button>
         </div>
       </nav>
@@ -345,23 +370,26 @@
     <section class="section" id="explore">
       <div class="container">
         <div class="section-heading">
-          <div><div class="section-kicker">Explore smarter</div><h2>Find a college that fits <br />your goals.</h2><p class="section-desc">Filter by subject, degree, research interests and campus life. These demo profiles show how the explorer will work once verified college data is added.</p></div>
+          <div><div class="section-kicker">Explore smarter</div><h2>Find a college that fits <br />your goals.</h2><p class="section-desc">Compare central universities, IITs and NITs by institution name, stream, course level, subject and location. Academic and campus insights will appear from your managed Campus Guide dataset.</p></div>
           <button class="btn btn-outline" data-open-modal="feedback">Share student feedback <span aria-hidden="true">↗</span></button>
         </div>
         <div class="explorer">
-          <div class="demo-alert"><span aria-hidden="true">ⓘ</span><div><strong>Preview content — demo data only</strong>The college names, scores and ratings below are illustrative placeholders, not real rankings or verified reviews. Replace them with consent-based, verified student feedback before public launch.</div></div>
+          <div class="demo-alert" id="directoryDataNotice"><span aria-hidden="true">ⓘ</span><div><strong id="directoryNoticeTitle">Preview mode — sample records only</strong><span id="directoryNoticeText">These records demonstrate the filters only. Connect your Campus Guide database and add institution-specific information before publishing real ratings or research claims.</span></div></div>
           <div class="filter-grid">
-            <div class="field"><label for="searchInput">Search colleges or research areas</label><input id="searchInput" type="search" placeholder="e.g. materials science, Delhi, physics" /></div>
-            <div class="field"><label for="degreeFilter">Degree level</label><select id="degreeFilter"><option value="">Any degree</option><option>UG</option><option>PG</option><option>PhD</option></select></div>
-            <div class="field"><label for="subjectFilter">Subject</label><select id="subjectFilter"><option value="">Any subject</option><option>Physics</option><option>Engineering</option><option>Computer Science</option><option>Chemistry</option><option>Biology</option><option>Economics</option></select></div>
+            <div class="field"><label for="searchInput">Institution name / city / research area</label><input id="searchInput" type="search" placeholder="e.g. IIT Delhi, central university, materials science" /></div>
+            <div class="field"><label for="institutionTypeFilter">Institution type</label><select id="institutionTypeFilter"><option value="">All institution types</option><option value="central_university">Central University</option><option value="iit">IIT</option><option value="nit">NIT</option></select></div>
+            <div class="field"><label for="streamFilter">Your stream</label><select id="streamFilter"><option value="">All streams</option><option>Science</option><option>Commerce</option><option>Arts</option><option>Other</option></select></div>
+            <div class="field"><label for="degreeFilter">Study level</label><select id="degreeFilter"><option value="">UG / PG / PhD</option><option value="UG">UG</option><option value="PG">PG</option><option value="PhD">PhD</option></select></div>
+            <div class="field"><label for="subjectFilter">Subject / discipline</label><select id="subjectFilter"><option value="">All subjects</option><option>Physics</option><option>Engineering</option><option>Computer Science</option><option>Chemistry</option><option>Biology</option><option>Mathematics</option><option>Economics</option><option>Commerce</option><option>History</option><option>Political Science</option><option>Sociology</option><option>Psychology</option><option>Law</option><option>Management</option><option>Humanities</option><option>Social Sciences</option><option>Medicine</option><option>Agriculture</option></select></div>
+            <div class="field"><label for="stateFilter">State / UT</label><select id="stateFilter"><option value="">All states & UTs</option><option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option><option>Bihar</option><option>Chandigarh</option><option>Chhattisgarh</option><option>Delhi</option><option>Goa</option><option>Gujarat</option><option>Haryana</option><option>Himachal Pradesh</option><option>Jammu and Kashmir</option><option>Jharkhand</option><option>Karnataka</option><option>Kerala</option><option>Ladakh</option><option>Madhya Pradesh</option><option>Maharashtra</option><option>Manipur</option><option>Meghalaya</option><option>Mizoram</option><option>Nagaland</option><option>Odisha</option><option>Puducherry</option><option>Punjab</option><option>Rajasthan</option><option>Sikkim</option><option>Tamil Nadu</option><option>Telangana</option><option>Tripura</option><option>Uttar Pradesh</option><option>Uttarakhand</option><option>West Bengal</option></select></div>
             <div class="field"><label for="environmentFilter">Campus environment</label><select id="environmentFilter"><option value="">Any environment</option><option>Research-focused</option><option>Peaceful</option><option>Vibrant</option></select></div>
-            <div class="field"><label for="hostelFilter">Hostel feedback</label><select id="hostelFilter"><option value="">Any rating</option><option value="4.5">Excellent (4.5+)</option><option value="4">Good (4.0+)</option><option value="3.5">Fair (3.5+)</option></select></div>
+            <div class="field"><label for="hostelFilter">Minimum hostel rating</label><select id="hostelFilter"><option value="">Any rating</option><option value="4.5">4.5 and above</option><option value="4">4.0 and above</option><option value="3.5">3.5 and above</option></select></div>
           </div>
-          <div class="filter-bottom"><div class="result-label"><strong id="resultCount">6</strong> sample profiles shown</div><div class="sort-wrap"><label for="sortFilter">Sort by</label><select id="sortFilter"><option value="overall">Overall score</option><option value="research">Research score</option><option value="academics">Academic score</option><option value="hostel">Hostel score</option></select><button class="btn btn-outline btn-small" id="resetFilters">Reset filters</button></div></div>
+          <div class="filter-bottom"><div class="result-label"><strong id="resultCount">0</strong> matching institutions</div><div class="sort-wrap"><label for="sortFilter">Sort by</label><select id="sortFilter"><option value="overall">Overall feedback</option><option value="research">Research score</option><option value="academics">Academic score</option><option value="hostel">Hostel score</option></select><button class="btn btn-outline btn-small" id="resetFilters">Reset filters</button></div></div>
         </div>
         <div class="college-grid" id="collegeGrid" aria-live="polite"></div>
-        <div class="empty-state" id="emptyState" hidden><strong>No matching demo profiles found.</strong>Try changing a filter or clearing the search.</div>
-        <p class="small-note">Important: scores and descriptions on this preview are illustrative only. A real student review system should publish transparent rating criteria, moderation rules and the date of the latest feedback.</p>
+        <div class="empty-state" id="emptyState" hidden><strong>No matching institutions found.</strong>Try a different filter, or add matching institution records to the Campus Guide database.</div>
+        <p class="small-note">Campus Guide should publish only institution data that has been checked and student feedback that has been moderated. Do not treat empty fields as poor ratings; they mean that verified data is not available yet.</p>
       </div>
     </section>
 
@@ -380,7 +408,7 @@
     <section class="section mentor-section" id="mentorship">
       <div class="container mentor-grid">
         <div><div class="section-kicker">Learn from someone who's been there</div><h2>Good guidance can change your journey.</h2><p class="section-desc">Not sure which course to choose, how research works, or what campus life is really like? Connect with a peer mentor for practical, experience-based guidance.</p><div class="mentor-benefits"><div class="benefit"><b>✳</b> Subject & course clarity</div><div class="benefit"><b>✳</b> Research pathway guidance</div><div class="benefit"><b>✳</b> Application preparation</div><div class="benefit"><b>✳</b> Campus-life questions</div></div></div>
-        <div class="mentor-panel"><div class="panel-top"><div class="mentor-icon">✦</div><div><h3>Find your peer mentor</h3><div class="sub">A student-first guidance request</div></div></div><p>Tell us your study level and what you need help with. This preview will collect the form details locally only; connect a secure backend before accepting real requests.</p><div class="field" style="margin:15px 0"><label for="mentorTopic">What would you like help with?</label><select id="mentorTopic"><option>Choosing a college or subject</option><option>Research opportunities</option><option>Applications and interviews</option><option>Hostel and campus life</option><option>General academic mentorship</option></select></div><button class="btn btn-primary" data-open-modal="mentor">Request mentorship <span aria-hidden="true">↗</span></button><p class="panel-note">No mentor is assigned in demo mode.</p></div>
+        <div class="mentor-panel"><div class="panel-top"><div class="mentor-icon">✦</div><div><h3>Find your peer mentor</h3><div class="sub">A student-first guidance request</div></div></div><p>Tell us your study level and what you need help with. A verified account is required, and the request will be sent to the Campus Guide database when it is connected.</p><div class="field" style="margin:15px 0"><label for="mentorTopic">What would you like help with?</label><select id="mentorTopic"><option>Choosing a college or subject</option><option>Research opportunities</option><option>Applications and interviews</option><option>Hostel and campus life</option><option>General academic mentorship</option></select></div><button class="btn btn-primary" data-open-modal="mentor">Request mentorship <span aria-hidden="true">↗</span></button><p class="panel-note">Requests are stored for the Campus Guide team to review after the database is connected.</p></div>
       </div>
     </section>
 
@@ -398,45 +426,120 @@
       <div class="container"><div class="section-heading"><div><div class="section-kicker">A few important details</div><h2>Frequently asked questions</h2></div></div>
         <div class="faq-list">
           <details><summary>Are the college ratings on this page real?</summary><p>No. This starter website uses illustrative demo profiles only. Add actual college information after collecting and checking student feedback, and clearly show how each score is calculated.</p></details>
-          <details><summary>How will login with email or phone work?</summary><p>The current page includes a demo sign-in interface only. Real authentication requires a secure provider and a backend. Do not use this static demo to collect passwords or OTPs.</p></details>
+          <details><summary>How will login with email or phone work?</summary><p>Email and phone verification, password setup and persistent sessions use Supabase Auth. They become active after the project URL, public key, email template and SMS provider are configured.</p></details>
           <details><summary>Can students submit anonymous feedback?</summary><p>You can design a privacy-conscious review policy that allows public anonymity while privately verifying student status. Explain what is collected, who can access it, and how reviews are moderated.</p></details>
-          <details><summary>How will the college filters be updated?</summary><p>In production, profile data should come from a database or admin-managed content system. The current filters operate on a small in-page demo dataset.</p></details>
+          <details><summary>How will the college filters be updated?</summary><p>The live filters read records from the Campus Guide institutions table. The team can add or update institution information through the Supabase dashboard or an admin panel.</p></details>
         </div>
       </div>
     </section>
 
-    <div class="closing-cta"><div class="container"><div class="closing-card"><div><h2>The right college is the one that fits your future.</h2><p>Explore with curiosity. Compare with context. Decide with confidence.</p></div><a href="#explore" class="btn btn-primary">Explore the preview <span aria-hidden="true">↗</span></a></div></div></div>
+    <div class="closing-cta"><div class="container"><div class="closing-card"><div><h2>The right college is the one that fits your future.</h2><p>Compare central universities, IITs and NITs with student-informed context.</p></div><a href="#explore" class="btn btn-primary">Explore the preview <span aria-hidden="true">↗</span></a></div></div></div>
   </main>
 
   <footer>
-    <div class="container"><div class="footer-top"><div><a class="brand" href="#home"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none"><path d="M4 17.5 9.2 5l3.1 7 2-4.2L20 19" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 19h13" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg></span><span>Career<span>Guide</span></span></a><p class="footer-blurb">A student-first college discovery and peer mentorship platform. Better information can help students make decisions that fit their goals.</p></div><div class="footer-links"><div class="footer-col"><strong>Explore</strong><a href="#explore">Find colleges</a><a href="#how-it-works">How it works</a><a href="#mentorship">Mentorship</a></div><div class="footer-col"><strong>Community</strong><a href="#feedback">Student feedback</a><a href="https://www.instagram.com/de_v_a_n_sh_/" target="_blank" rel="noopener noreferrer">Instagram ↗</a><a href="mailto:hello@careerguide.example">Contact (replace email)</a></div></div></div><div class="footer-bottom"><span>© <span id="year"></span> CareerGuide. All rights reserved.</span><span>Preview website · Replace demo data and connect secure services before launch.</span></div></div>
+    <div class="container"><div class="footer-top"><div><a class="brand" href="#home"><img class="brand-logo" src="campus-guide-logo.jpeg" alt="Campus Guide logo" /><span>Campus <span>Guide</span></span></a><p class="footer-blurb">A student-first college discovery and peer mentorship platform for Indian central universities, IITs and NITs. Better information can help students make decisions that fit their goals.</p></div><div class="footer-links"><div class="footer-col"><strong>Explore</strong><a href="#explore">Find colleges</a><a href="#how-it-works">How it works</a><a href="#mentorship">Mentorship</a></div><div class="footer-col"><strong>Community</strong><a href="#feedback">Student feedback</a><a href="https://www.instagram.com/de_v_a_n_sh_/" target="_blank" rel="noopener noreferrer">Instagram ↗</a><a href="mailto:hello@campusguide.example">Contact (add your official email)</a></div></div></div><div class="footer-bottom"><span>© <span id="year"></span> Campus Guide. All rights reserved.</span><span>Preview website · Replace demo data and connect secure services before launch.</span></div></div>
   </footer>
 
-  <!-- Demo modal: the forms below do not authenticate or transmit/store information. -->
+  <!-- Campus Guide account workflow. Requires Supabase configuration to send real OTPs. -->
   <div class="modal-backdrop" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
-    <div class="modal"><button class="modal-close" data-close-modal aria-label="Close">×</button><div class="section-kicker">Your student journey</div><h2 id="authTitle">Welcome to CareerGuide.</h2><p class="modal-intro">Sign in to personalise your college discovery. This is a front-end preview only; no account will be created.</p><div class="modal-tabs"><button type="button" class="active" data-auth-tab="email">Email</button><button type="button" data-auth-tab="phone">Phone</button></div><form id="authForm" class="modal-form"><div class="field"><label id="authInputLabel" for="authInput">Email address</label><input id="authInput" type="email" placeholder="you@example.com" required autocomplete="email" /></div><div class="field"><label for="authPassword">Password (demo field)</label><input id="authPassword" type="password" placeholder="Do not enter a real password" required autocomplete="off" /></div><button class="btn btn-primary" type="submit" id="authSubmit">Continue with email</button><div class="form-message" id="authMessage" role="status"></div></form><p class="modal-footnote">Production requirement: use a trusted authentication provider, secure sessions, OTP rate limits and a privacy notice. Never store passwords in browser code.</p></div>
+    <div class="modal">
+      <button class="modal-close" data-close-modal aria-label="Close">×</button>
+      <div class="section-kicker">Your student journey</div>
+      <h2 id="authTitle">Welcome to Campus Guide.</h2>
+      <p class="modal-intro" id="authIntro">Create a verified account or sign in to save your academic preferences.</p>
+      <div class="modal-tabs" id="authModeTabs">
+        <button type="button" class="active" data-auth-mode="login">Log in</button>
+        <button type="button" data-auth-mode="signup">Create account</button>
+      </div>
+      <div class="modal-tabs" id="authChannelTabs">
+        <button type="button" class="active" data-auth-tab="email">Email</button>
+        <button type="button" data-auth-tab="phone">Phone</button>
+      </div>
+      <div id="authStepLogin">
+        <form id="loginForm" class="modal-form">
+          <div class="field"><label for="loginContact" id="loginContactLabel">Email address</label><input id="loginContact" type="email" placeholder="you@example.com" required autocomplete="username" /></div>
+          <div class="field"><label for="loginPassword">Password</label><input id="loginPassword" type="password" placeholder="Enter your password" required minlength="8" autocomplete="current-password" /></div>
+          <button class="btn btn-primary" type="submit" id="loginSubmit">Log in with email</button>
+          <div class="form-message" id="loginMessage" role="status"></div>
+        </form>
+        <p class="modal-footnote">Use the email address or phone number you verified when creating your account.</p>
+      </div>
+      <div id="authStepSignupContact" hidden>
+        <form id="signupContactForm" class="modal-form">
+          <div class="field"><label for="signupContact" id="signupContactLabel">Email address</label><input id="signupContact" type="email" placeholder="you@example.com" required autocomplete="email" /></div>
+          <button class="btn btn-primary" type="submit" id="sendOtpBtn">Send verification code</button>
+          <div class="form-message" id="signupContactMessage" role="status"></div>
+        </form>
+        <p class="modal-footnote">For phone verification, use the international format, such as +91XXXXXXXXXX. SMS delivery requires a configured SMS provider.</p>
+      </div>
+      <div id="authStepOtp" hidden>
+        <form id="otpForm" class="modal-form">
+          <div class="field"><label for="otpCode">Verification code</label><input id="otpCode" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,8}" minlength="6" maxlength="8" placeholder="Enter the code you received" required /></div>
+          <button class="btn btn-primary" type="submit">Verify code</button>
+          <button class="btn btn-outline" id="resendOtpBtn" type="button">Resend code</button>
+          <div class="form-message" id="otpMessage" role="status"></div>
+        </form>
+      </div>
+      <div id="authStepPassword" hidden>
+        <form id="passwordForm" class="modal-form">
+          <div class="field"><label for="newPassword">Create password</label><input id="newPassword" type="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters" required /></div>
+          <div class="field"><label for="confirmPassword">Confirm password</label><input id="confirmPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Enter the same password again" required /></div>
+          <button class="btn btn-primary" type="submit">Save password and continue</button>
+          <div class="form-message" id="passwordMessage" role="status"></div>
+        </form>
+      </div>
+      <div id="authStepProfile" hidden>
+        <form id="profileForm" class="modal-form">
+          <div class="field"><label for="profileName">Full name</label><input id="profileName" autocomplete="name" placeholder="Your full name" required /></div>
+          <div class="field"><label for="profileStream">Your school stream / academic stream</label><select id="profileStream" required><option value="">Choose stream</option><option>Science</option><option>Commerce</option><option>Arts</option><option>Other</option></select></div>
+          <div class="field"><label for="profileQualification">Highest completed qualification</label><select id="profileQualification" required><option value="">Choose qualification</option><option>Class 10</option><option>Class 12</option><option>Diploma</option><option>Bachelor's degree</option><option>Master's degree</option><option>Other</option></select></div>
+          <div class="field"><label for="profileTargetLevel">What are you looking for?</label><select id="profileTargetLevel" required><option value="">Choose target study level</option><option value="UG">Undergraduate (UG)</option><option value="PG">Postgraduate (PG)</option><option value="PhD">PhD / Research</option></select></div>
+          <div class="field"><label for="profileSubject">Preferred subject</label><select id="profileSubject" required><option value="">Choose subject</option><option>Physics</option><option>Engineering</option><option>Computer Science</option><option>Chemistry</option><option>Biology</option><option>Mathematics</option><option>Economics</option><option>Commerce</option><option>History</option><option>Political Science</option><option>Sociology</option><option>Psychology</option><option>Law</option><option>Management</option><option>Humanities</option><option>Social Sciences</option><option>Medicine</option><option>Agriculture</option><option>Other</option></select></div>
+          <div class="field"><label for="profileInstituteType">Preferred institution type</label><select id="profileInstituteType"><option value="">No preference</option><option value="central_university">Central University</option><option value="iit">IIT</option><option value="nit">NIT</option></select></div>
+          <div class="field"><label for="profileState">Preferred state / UT</label><select id="profileState"><option value="">No state preference</option><option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option><option>Bihar</option><option>Chandigarh</option><option>Chhattisgarh</option><option>Delhi</option><option>Goa</option><option>Gujarat</option><option>Haryana</option><option>Himachal Pradesh</option><option>Jammu and Kashmir</option><option>Jharkhand</option><option>Karnataka</option><option>Kerala</option><option>Ladakh</option><option>Madhya Pradesh</option><option>Maharashtra</option><option>Manipur</option><option>Meghalaya</option><option>Mizoram</option><option>Nagaland</option><option>Odisha</option><option>Puducherry</option><option>Punjab</option><option>Rajasthan</option><option>Sikkim</option><option>Tamil Nadu</option><option>Telangana</option><option>Tripura</option><option>Uttar Pradesh</option><option>Uttarakhand</option><option>West Bengal</option></select></div>
+          <div class="field"><label for="profileCurrentInstitute">Current institution (optional)</label><input id="profileCurrentInstitute" placeholder="If you already study at a college" /></div>
+          <button class="btn btn-primary" type="submit" id="saveProfileBtn">Save my profile</button>
+          <div class="form-message" id="profileMessage" role="status"></div>
+        </form>
+        <p class="modal-footnote">These details personalise the filters. Only share information needed to guide your education choices.</p>
+      </div>
+      <div class="form-message error" id="authGlobalMessage" role="status"></div>
+      <p class="modal-footnote" id="authConfigFootnote">Account verification becomes active after connecting Supabase and configuring its email / SMS delivery settings. The site never stores passwords in browser storage.</p>
+    </div>
   </div>
 
   <div class="modal-backdrop" id="feedbackModal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
-    <div class="modal"><button class="modal-close" data-close-modal aria-label="Close">×</button><div class="section-kicker">Student voice</div><h2 id="feedbackTitle">Share your campus experience.</h2><p class="modal-intro">A balanced, specific review helps other students understand what campus life is really like. Demo submissions are not saved or published.</p><form id="feedbackForm" class="modal-form"><div class="field"><label for="fbCollege">College / institute</label><input id="fbCollege" required placeholder="Enter institute name" /></div><div class="field"><label for="fbProgram">Course / subject</label><input id="fbProgram" required placeholder="e.g. M.Sc. Physics" /></div><div class="field"><label for="fbCategory">What are you reviewing?</label><select id="fbCategory"><option>Academics & faculty</option><option>Research & laboratories</option><option>Hostel & accommodation</option><option>Food & mess</option><option>Campus environment</option><option>Overall experience</option></select></div><div class="field"><label for="fbRating">Your rating (1–5)</label><select id="fbRating" required><option value="">Choose a rating</option><option value="5">5 — Excellent</option><option value="4">4 — Good</option><option value="3">3 — Average</option><option value="2">2 — Needs improvement</option><option value="1">1 — Poor</option></select></div><div class="field"><label for="fbReview">Your feedback</label><textarea id="fbReview" rows="4" required minlength="20" placeholder="Share a specific, respectful and useful experience (at least 20 characters)."></textarea></div><button class="btn btn-primary" type="submit">Preview submission</button><div class="form-message" id="feedbackMessage" role="status"></div></form><p class="modal-footnote">Please do not include sensitive personal data or allegations about identifiable individuals. A real platform should verify and moderate reviews before publishing.</p></div>
+    <div class="modal"><button class="modal-close" data-close-modal aria-label="Close">×</button><div class="section-kicker">Student voice</div><h2 id="feedbackTitle">Share your campus experience.</h2><p class="modal-intro">A balanced, specific review helps other students understand what campus life is really like. Submissions require a verified account and are held for moderation before they can appear publicly.</p><form id="feedbackForm" class="modal-form"><div class="field"><label for="fbCollege">College / institute</label><input id="fbCollege" required placeholder="Enter institute name" /></div><div class="field"><label for="fbProgram">Course / subject</label><input id="fbProgram" required placeholder="e.g. M.Sc. Physics" /></div><div class="field"><label for="fbCategory">What are you reviewing?</label><select id="fbCategory"><option>Academics & faculty</option><option>Research & laboratories</option><option>Hostel & accommodation</option><option>Food & mess</option><option>Campus environment</option><option>Overall experience</option></select></div><div class="field"><label for="fbRating">Your rating (1–5)</label><select id="fbRating" required><option value="">Choose a rating</option><option value="5">5 — Excellent</option><option value="4">4 — Good</option><option value="3">3 — Average</option><option value="2">2 — Needs improvement</option><option value="1">1 — Poor</option></select></div><div class="field"><label for="fbReview">Your feedback</label><textarea id="fbReview" rows="4" required minlength="20" placeholder="Share a specific, respectful and useful experience (at least 20 characters)."></textarea></div><button class="btn btn-primary" type="submit">Submit for moderation</button><div class="form-message" id="feedbackMessage" role="status"></div></form><p class="modal-footnote">Please do not include sensitive personal data or allegations about identifiable individuals. A real platform should verify and moderate reviews before publishing.</p></div>
   </div>
 
   <div class="modal-backdrop" id="mentorModal" role="dialog" aria-modal="true" aria-labelledby="mentorTitle">
-    <div class="modal"><button class="modal-close" data-close-modal aria-label="Close">×</button><div class="section-kicker">Peer support</div><h2 id="mentorTitle">Request student mentorship.</h2><p class="modal-intro">Share a little about your goals so the right type of guidance can be planned. This demo form does not send your information anywhere.</p><form id="mentorForm" class="modal-form"><div class="field"><label for="mentorName">Your name</label><input id="mentorName" required placeholder="Your name" /></div><div class="field"><label for="mentorContact">Email or phone</label><input id="mentorContact" required placeholder="Your contact detail" /></div><div class="field"><label for="mentorLevel">Current study level</label><select id="mentorLevel"><option>Class 11–12</option><option>Undergraduate</option><option>Postgraduate</option><option>Research / PhD</option><option>Other</option></select></div><div class="field"><label for="mentorHelp">What do you need help with?</label><textarea id="mentorHelp" rows="3" required placeholder="Tell us about your subject, goals or questions."></textarea></div><button class="btn btn-primary" type="submit">Preview mentorship request</button><div class="form-message" id="mentorMessage" role="status"></div></form></div>
+    <div class="modal"><button class="modal-close" data-close-modal aria-label="Close">×</button><div class="section-kicker">Peer support</div><h2 id="mentorTitle">Request student mentorship.</h2><p class="modal-intro">Share a little about your goals so the right type of guidance can be planned. A verified student account is required. Mentorship requests are sent to the Campus Guide database when connected.</p><form id="mentorForm" class="modal-form"><div class="field"><label for="mentorName">Your name</label><input id="mentorName" required placeholder="Your name" /></div><div class="field"><label for="mentorContact">Email or phone</label><input id="mentorContact" required placeholder="Your contact detail" /></div><div class="field"><label for="mentorLevel">Current study level</label><select id="mentorLevel"><option>Class 11–12</option><option>Undergraduate</option><option>Postgraduate</option><option>Research / PhD</option><option>Other</option></select></div><div class="field"><label for="mentorHelp">What do you need help with?</label><textarea id="mentorHelp" rows="3" required placeholder="Tell us about your subject, goals or questions."></textarea></div><button class="btn btn-primary" type="submit">Send mentorship request</button><div class="form-message" id="mentorMessage" role="status"></div></form></div>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
   <script>
-    // All records below are intentionally fictional demo content. Replace with verified records before launch.
-    const colleges = [
-      { id: 1, name: 'Demo Institute of Science', city: 'North India', type: 'Science & Research', degrees: ['PG','PhD'], subjects: ['Physics','Chemistry','Biology'], tags: ['Materials research','Lab exposure'], environment: 'Research-focused', overall: 4.6, academics: 4.8, research: 4.9, hostel: 4.1, food: 3.9, cover: 'cover-sage', icon: 'atom', text: 'Illustrative profile for science-focused students and research pathways.' },
-      { id: 2, name: 'Demo Tech University', city: 'West India', type: 'Engineering & Technology', degrees: ['UG','PG','PhD'], subjects: ['Engineering','Computer Science','Physics'], tags: ['Project culture','Industry links'], environment: 'Vibrant', overall: 4.4, academics: 4.5, research: 4.2, hostel: 4.4, food: 4.2, cover: 'cover-blue', icon: 'building', text: 'Illustrative profile for project-based learning and technical programmes.' },
-      { id: 3, name: 'Demo College of Liberal Studies', city: 'South India', type: 'Interdisciplinary', degrees: ['UG','PG'], subjects: ['Economics','Biology','Chemistry'], tags: ['Interdisciplinary','Student clubs'], environment: 'Peaceful', overall: 4.2, academics: 4.3, research: 3.8, hostel: 4.5, food: 4.1, cover: 'cover-peach', icon: 'book', text: 'Illustrative profile for students who value broad academic choices.' },
-      { id: 4, name: 'Demo Centre for Advanced Studies', city: 'East India', type: 'Research Institute', degrees: ['PG','PhD'], subjects: ['Physics','Computer Science','Chemistry'], tags: ['Advanced labs','Research culture'], environment: 'Research-focused', overall: 4.7, academics: 4.6, research: 4.9, hostel: 3.8, food: 3.7, cover: 'cover-lavender', icon: 'atom', text: 'Illustrative profile for specialised research and laboratory experience.' },
-      { id: 5, name: 'Demo University of Life Sciences', city: 'Central India', type: 'Life Sciences', degrees: ['UG','PG','PhD'], subjects: ['Biology','Chemistry'], tags: ['Field work','Mentorship'], environment: 'Peaceful', overall: 4.1, academics: 4.2, research: 4.0, hostel: 4.2, food: 4.0, cover: 'cover-yellow', icon: 'leaf', text: 'Illustrative profile for biological sciences and hands-on learning.' },
-      { id: 6, name: 'Demo School of Computing', city: 'North India', type: 'Computing & Data', degrees: ['UG','PG','PhD'], subjects: ['Computer Science','Engineering','Economics'], tags: ['Computing','Collaborative projects'], environment: 'Vibrant', overall: 4.3, academics: 4.5, research: 4.1, hostel: 4.0, food: 3.8, cover: 'cover-mint', icon: 'laptop', text: 'Illustrative profile for computing, data and applied project work.' }
+    const $ = (id) => document.getElementById(id);
+    const safeText = (s) => String(s ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    const config = window.CAMPUS_GUIDE_CONFIG || {};
+    const configured = Boolean(window.supabase && config.SUPABASE_URL && config.SUPABASE_ANON_KEY && !String(config.SUPABASE_URL).includes('PASTE_') && !String(config.SUPABASE_ANON_KEY).includes('PASTE_'));
+    const supabase = configured ? window.supabase.createClient(config.SUPABASE_URL, config.SUPABASE_ANON_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }) : null;
+
+    // Clearly labelled preview-only records. Live records come from Supabase's public.institutions table.
+    const previewInstitutions = [
+      { id: 'demo-1', name: 'Demo Institute of Science', city: 'North India', state: 'Delhi', institution_type: 'central_university', type: 'Central University', degrees: ['PG','PhD'], streams: ['Science'], subjects: ['Physics','Chemistry','Biology'], tags: ['Materials research','Lab exposure'], environment: 'Research-focused', overall: 4.6, academics: 4.8, research: 4.9, hostel: 4.1, food: 3.9, cover: 'cover-sage', icon: 'atom', text: 'Illustrative profile showing how research and academic details will appear.', is_demo: true },
+      { id: 'demo-2', name: 'Demo Technology Institute', city: 'West India', state: 'Maharashtra', institution_type: 'iit', type: 'IIT', degrees: ['UG','PG','PhD'], streams: ['Science'], subjects: ['Engineering','Computer Science','Physics'], tags: ['Project culture','Industry links'], environment: 'Vibrant', overall: 4.4, academics: 4.5, research: 4.2, hostel: 4.4, food: 4.2, cover: 'cover-blue', icon: 'building', text: 'Illustrative profile for project-based learning and technical programmes.', is_demo: true },
+      { id: 'demo-3', name: 'Demo University of Liberal Studies', city: 'South India', state: 'Tamil Nadu', institution_type: 'central_university', type: 'Central University', degrees: ['UG','PG'], streams: ['Arts','Commerce'], subjects: ['Economics','History','Sociology'], tags: ['Interdisciplinary','Student clubs'], environment: 'Peaceful', overall: 4.2, academics: 4.3, research: 3.8, hostel: 4.5, food: 4.1, cover: 'cover-peach', icon: 'book', text: 'Illustrative profile for students who value broad academic choices.', is_demo: true },
+      { id: 'demo-4', name: 'Demo National Research Institute', city: 'East India', state: 'Odisha', institution_type: 'nit', type: 'NIT', degrees: ['UG','PG','PhD'], streams: ['Science'], subjects: ['Physics','Computer Science','Engineering'], tags: ['Advanced labs','Research culture'], environment: 'Research-focused', overall: 4.7, academics: 4.6, research: 4.9, hostel: 3.8, food: 3.7, cover: 'cover-lavender', icon: 'atom', text: 'Illustrative profile for specialised research and laboratory experience.', is_demo: true },
+      { id: 'demo-5', name: 'Demo Life Sciences University', city: 'Central India', state: 'Madhya Pradesh', institution_type: 'central_university', type: 'Central University', degrees: ['UG','PG','PhD'], streams: ['Science'], subjects: ['Biology','Chemistry','Agriculture'], tags: ['Field work','Mentorship'], environment: 'Peaceful', overall: 4.1, academics: 4.2, research: 4.0, hostel: 4.2, food: 4.0, cover: 'cover-yellow', icon: 'leaf', text: 'Illustrative profile for biological sciences and hands-on learning.', is_demo: true },
+      { id: 'demo-6', name: 'Demo Computing Institute', city: 'North India', state: 'Haryana', institution_type: 'nit', type: 'NIT', degrees: ['UG','PG','PhD'], streams: ['Science'], subjects: ['Computer Science','Engineering','Mathematics'], tags: ['Computing','Collaborative projects'], environment: 'Vibrant', overall: 4.3, academics: 4.5, research: 4.1, hostel: 4.0, food: 3.8, cover: 'cover-mint', icon: 'laptop', text: 'Illustrative profile for computing, data and applied project work.', is_demo: true }
     ];
-    const saved = new Set(JSON.parse(localStorage.getItem('cgSavedDemo') || '[]'));
+    let colleges = [...previewInstitutions];
+    let liveDirectory = false;
+    let saved = new Set();
+    try { saved = new Set(JSON.parse(localStorage.getItem('campusGuideSaved') || '[]')); } catch (_) { saved = new Set(); }
+
     const iconMarkup = {
       atom: '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="2.2" stroke="currentColor" stroke-width="1.7"/><ellipse cx="12" cy="12" rx="9" ry="4" stroke="currentColor" stroke-width="1.5"/><ellipse cx="12" cy="12" rx="9" ry="4" stroke="currentColor" stroke-width="1.5" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="4" stroke="currentColor" stroke-width="1.5" transform="rotate(120 12 12)"/></svg>',
       building: '<svg viewBox="0 0 24 24" fill="none"><path d="M4 20V8l8-4 8 4v12M2 20h20M8 10h2m4 0h2M8 14h2m4 0h2M10 20v-3h4v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
@@ -444,107 +547,437 @@
       leaf: '<svg viewBox="0 0 24 24" fill="none"><path d="M20.5 3.5C10 3.7 4 7.3 4 13a5 5 0 0 0 5 5c6 0 9.6-6 11.5-14.5ZM3 21c3-6 7-9 12-12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
       laptop: '<svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="12" rx="1.8" stroke="currentColor" stroke-width="1.7"/><path d="M2.5 20h19l-1.5-3H4l-1.5 3ZM10 7.5h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>'
     };
-    const $ = (id) => document.getElementById(id);
-    const safeText = (s) => String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    let currentUser = null;
+    let currentProfile = null;
+    let authMode = 'login';
+    let authChannel = 'email';
+    let pendingContact = '';
+    let pendingOtpUser = null;
+    let toastTimer;
+
+    function showMessage(id, message, isError = false) {
+      const el = $(id); if (!el) return;
+      el.textContent = message;
+      el.classList.toggle('show', Boolean(message));
+      el.classList.toggle('error', Boolean(isError));
+    }
+    function clearAuthMessages() {
+      ['loginMessage','signupContactMessage','otpMessage','passwordMessage','profileMessage','authGlobalMessage'].forEach(id => showMessage(id, ''));
+    }
+    function showToast(message) {
+      const toast = $('toast'); toast.textContent = message; toast.classList.add('show');
+      clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
+    }
+    function closeAllModals() { document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('open')); document.body.style.overflow = ''; }
+    function showModal(id) { closeAllModals(); $(id).classList.add('open'); document.body.style.overflow = 'hidden'; }
+    function openModal(name) {
+      if (name === 'feedback' || name === 'mentor') {
+        if (!currentUser) { setAuthMode('signup'); showModal('loginModal'); showToast('Please create a verified account or log in first.'); return; }
+        if (name === 'feedback' && currentProfile?.current_institution) $('fbCollege').value = currentProfile.current_institution;
+      }
+      if (name === 'login' || name === 'signup') {
+        setAuthMode(name);
+        if (name === 'signup' && currentUser && !currentProfile) setAuthStep('profile');
+        showModal('loginModal');
+        if (name === 'login') $('loginContact').focus(); else $('signupContact').focus();
+        return;
+      }
+      showModal(name === 'feedback' ? 'feedbackModal' : 'mentorModal');
+    }
+
+    function setAuthMode(mode) {
+      authMode = mode;
+      clearAuthMessages();
+      $('authTitle').textContent = mode === 'signup' ? 'Create your Campus Guide account.' : 'Welcome back to Campus Guide.';
+      $('authIntro').textContent = mode === 'signup' ? 'Verify your email or phone, set a password, then build your student profile.' : 'Log in with your verified email or phone number and password.';
+      document.querySelectorAll('[data-auth-mode]').forEach(btn => btn.classList.toggle('active', btn.dataset.authMode === mode));
+      setAuthStep(mode === 'signup' ? 'signupContact' : 'login');
+    }
+    function setAuthStep(step) {
+      ['Login','SignupContact','Otp','Password','Profile'].forEach(name => { const el = $('authStep' + name); if (el) el.hidden = name.toLowerCase() !== step.toLowerCase(); });
+      const showTabs = step === 'login' || step === 'signupContact';
+      $('authModeTabs').hidden = !showTabs;
+      $('authChannelTabs').hidden = !showTabs;
+      clearAuthMessages();
+    }
+    function setChannel(channel) {
+      authChannel = channel;
+      document.querySelectorAll('[data-auth-tab]').forEach(btn => btn.classList.toggle('active', btn.dataset.authTab === channel));
+      const isPhone = channel === 'phone';
+      for (const [id, labelId] of [['loginContact','loginContactLabel'], ['signupContact','signupContactLabel']]) {
+        $(id).type = isPhone ? 'tel' : 'email';
+        $(id).placeholder = isPhone ? '+91 98765 43210' : 'you@example.com';
+        $(id).autocomplete = isPhone ? 'tel' : (id === 'loginContact' ? 'username' : 'email');
+        $(labelId).textContent = isPhone ? 'Phone number (with country code)' : 'Email address';
+      }
+      $('loginSubmit').textContent = isPhone ? 'Log in with phone' : 'Log in with email';
+      $('sendOtpBtn').textContent = isPhone ? 'Send SMS verification code' : 'Send email verification code';
+      clearAuthMessages();
+    }
+    function normalizeContact(value) {
+      const v = String(value || '').trim();
+      if (authChannel === 'email') return v.toLowerCase();
+      return v.replace(/[\s()-]/g, '');
+    }
+    function contactPayload(contact) { return authChannel === 'email' ? { email: contact } : { phone: contact }; }
+    function requireBackend(messageId) {
+      if (supabase) return true;
+      showMessage(messageId, 'Abhi authentication/database connected nahi hai. ZIP ke README mein Supabase setup ke steps follow karo; phir OTP, password aur profile features active honge.', true);
+      return false;
+    }
+    function updateNav() {
+      const signedIn = Boolean(currentUser);
+      $('authLoginBtn').hidden = signedIn;
+      $('authSignupBtn').hidden = signedIn;
+      $('currentUserLabel').hidden = !signedIn;
+      $('logoutBtn').hidden = !signedIn;
+      const name = currentProfile?.full_name || currentUser?.email || currentUser?.phone || 'Student';
+      $('currentUserLabel').textContent = signedIn ? `Hi, ${name}` : '';
+      $('currentUserLabel').title = name;
+    }
+    async function loadProfile(userId) {
+      if (!supabase || !userId) return null;
+      const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
+      if (error) { console.error('Profile load error:', error.message); return null; }
+      return data;
+    }
+    function applyProfileFilters(profile) {
+      if (!profile) return;
+      if (profile.target_level) $('degreeFilter').value = profile.target_level;
+      if (profile.stream) $('streamFilter').value = profile.stream;
+      if (profile.subject && [...$('subjectFilter').options].some(o => o.value === profile.subject || o.text === profile.subject)) $('subjectFilter').value = profile.subject;
+      if (profile.preferred_state) $('stateFilter').value = profile.preferred_state;
+      if (profile.preferred_institution_type) $('institutionTypeFilter').value = profile.preferred_institution_type;
+      renderColleges();
+    }
+    async function finishLogin(user) {
+      currentUser = user;
+      currentProfile = await loadProfile(user.id);
+      updateNav();
+      if (currentProfile) {
+        applyProfileFilters(currentProfile);
+        closeAllModals();
+        showToast(`Welcome back, ${currentProfile.full_name || 'student'}! Your academic filters are ready.`);
+      } else {
+        fillProfileForm(null);
+        setAuthStep('profile');
+        showToast('One last step: complete your student profile.');
+      }
+    }
+    function fillProfileForm(profile) {
+      const p = profile || {};
+      $('profileName').value = p.full_name || '';
+      $('profileStream').value = p.stream || '';
+      $('profileQualification').value = p.current_qualification || '';
+      $('profileTargetLevel').value = p.target_level || '';
+      $('profileSubject').value = p.subject || '';
+      $('profileInstituteType').value = p.preferred_institution_type || '';
+      $('profileState').value = p.preferred_state || '';
+      $('profileCurrentInstitute').value = p.current_institution || '';
+    }
+    function normalizeRow(row) {
+      const typeLabels = { central_university: 'Central University', iit: 'IIT', nit: 'NIT' };
+      return {
+        id: row.id, name: row.name, institution_type: row.institution_type, type: typeLabels[row.institution_type] || row.institution_type || 'Institution',
+        city: row.city || '', state: row.state || '', degrees: row.levels || [], streams: row.streams || [], subjects: row.subjects || [], tags: row.research_areas || [],
+        environment: row.campus_environment || '', overall: row.overall_score == null ? null : Number(row.overall_score),
+        academics: row.academics_score == null ? null : Number(row.academics_score), research: row.research_score == null ? null : Number(row.research_score),
+        hostel: row.hostel_score == null ? null : Number(row.hostel_score), food: row.food_score == null ? null : Number(row.food_score),
+        text: row.academics_summary || row.research_summary || 'Institution directory entry. Student insights are being added after review.',
+        academics_summary: row.academics_summary || '', research_summary: row.research_summary || '', hostel_summary: row.hostel_summary || '', food_summary: row.food_summary || '',
+        cover: 'cover-sage', icon: 'building', profile_status: row.profile_status || 'directory_only', official_website: row.official_website || '', is_demo: false
+      };
+    }
+    async function loadDirectory() {
+      if (!supabase) {
+        liveDirectory = false;
+        colleges = [...previewInstitutions];
+        $('directoryNoticeTitle').textContent = 'Preview mode — sample records only';
+        $('directoryNoticeText').textContent = 'These records demonstrate the filters only. Connect your Campus Guide database and add institution-specific information before publishing real ratings or research claims.';
+        renderColleges();
+        return;
+      }
+      const { data, error } = await supabase.from('institutions').select('*').eq('is_active', true).order('name');
+      if (error) {
+        console.error('Institution data error:', error.message);
+        liveDirectory = true; colleges = [];
+        $('directoryNoticeTitle').textContent = 'Directory database needs attention';
+        $('directoryNoticeText').textContent = 'Supabase is connected, but institution records could not be loaded. Check that supabase-schema.sql has been run and the public read policy is enabled.';
+        renderColleges(); return;
+      }
+      liveDirectory = true;
+      colleges = (data || []).map(normalizeRow);
+      $('directoryNoticeTitle').textContent = 'Campus Guide directory';
+      $('directoryNoticeText').textContent = 'Results come from Campus Guide institution records. Academic, research, hostel and food scores remain blank until verified data is added; only approved student feedback should be published.';
+      renderColleges();
+    }
+    function formatScore(value) { return value === null || value === undefined || value === '' || !Number.isFinite(Number(value)) ? '<span class="missing-data">Not rated</span>' : Number(value).toFixed(1); }
     function renderColleges() {
+      if (!$('searchInput')) return;
       const query = $('searchInput').value.trim().toLowerCase();
+      const type = $('institutionTypeFilter').value;
+      const stream = $('streamFilter').value;
       const degree = $('degreeFilter').value;
       const subject = $('subjectFilter').value;
+      const state = $('stateFilter').value;
       const env = $('environmentFilter').value;
       const hostelFloor = Number($('hostelFilter').value || 0);
       const sort = $('sortFilter').value;
       let list = colleges.filter(c => {
-        const haystack = [c.name, c.city, c.type, c.text, ...c.subjects, ...c.tags].join(' ').toLowerCase();
-        return (!query || haystack.includes(query)) && (!degree || c.degrees.includes(degree)) && (!subject || c.subjects.includes(subject)) && (!env || c.environment === env) && (!hostelFloor || c.hostel >= hostelFloor);
+        const haystack = [c.name, c.city, c.state, c.type, c.text, c.academics_summary, c.research_summary, c.hostel_summary, c.food_summary, ...(c.subjects || []), ...(c.tags || []), ...(c.streams || [])].join(' ').toLowerCase();
+        return (!query || haystack.includes(query)) && (!type || c.institution_type === type) && (!stream || (c.streams || []).includes(stream)) && (!degree || (c.degrees || []).includes(degree)) && (!subject || (c.subjects || []).includes(subject)) && (!state || c.state === state) && (!env || c.environment === env) && (!hostelFloor || (c.hostel != null && c.hostel >= hostelFloor));
       });
-      list.sort((a,b) => b[sort] - a[sort]);
+      const sortField = { overall: 'overall', research: 'research', academics: 'academics', hostel: 'hostel' }[sort] || 'overall';
+      list.sort((a, b) => (Number(b[sortField] ?? -1) - Number(a[sortField] ?? -1)) || String(a.name).localeCompare(String(b.name)));
       $('resultCount').textContent = list.length;
-      $('collegeGrid').innerHTML = list.map(c => `
-        <article class="college-card">
-          <div class="college-cover ${c.cover}"><span class="cover-icon">${iconMarkup[c.icon]}</span><span class="sample-tag">DEMO PROFILE</span></div>
+      $('collegeGrid').innerHTML = list.map(c => {
+        const isDemo = Boolean(c.is_demo);
+        const tag = isDemo ? 'PREVIEW ONLY' : (c.profile_status === 'published' ? 'STUDENT INSIGHTS' : 'DIRECTORY ENTRY');
+        const location = [c.city, c.state].filter(Boolean).join(', ') || 'Location not added';
+        const summary = c.text || 'Institution listed. Verified academic and campus information will be shown here when added by Campus Guide.';
+        const streamChips = (c.streams || []).slice(0, 2).map(s => `<span class="chip">${safeText(s)}</span>`).join('');
+        const subjectChips = (c.subjects || []).slice(0, 2).map(s => `<span class="chip">${safeText(s)}</span>`).join('');
+        return `<article class="college-card">
+          <div class="college-cover ${safeText(c.cover || 'cover-sage')}"><span class="cover-icon">${iconMarkup[c.icon] || iconMarkup.building}</span><span class="sample-tag">${tag}</span></div>
           <div class="college-body">
-            <div class="location">⌖ ${safeText(c.city)} <span>·</span> ${safeText(c.type)}</div>
+            <div class="location">⌖ ${safeText(location)} <span>·</span> ${safeText(c.type || 'Institution')}</div>
             <h3 class="college-name">${safeText(c.name)}</h3>
-            <div class="college-sub">${safeText(c.text)}</div>
+            <div class="college-sub">${safeText(summary)}</div>
             <hr class="card-divider" />
-            <div class="metrics"><div class="metric"><strong>${c.academics.toFixed(1)}</strong><span>Academics</span></div><div class="metric"><strong>${c.research.toFixed(1)}</strong><span>Research</span></div><div class="metric"><strong>${c.hostel.toFixed(1)}</strong><span>Hostel</span></div></div>
-            <div class="chips">${c.subjects.slice(0,3).map(s=>`<span class="chip">${safeText(s)}</span>`).join('')}<span class="chip">${safeText(c.environment)}</span></div>
-            <div class="card-footer"><button class="save-btn ${saved.has(c.id)?'saved':''}" data-save="${c.id}" aria-pressed="${saved.has(c.id)}">${saved.has(c.id)?'✓ Saved':'＋ Save'}</button><button class="details-btn" data-details="${c.id}">View profile ↗</button></div>
+            <div class="metrics"><div class="metric"><strong>${formatScore(c.academics)}</strong><span>Academics</span></div><div class="metric"><strong>${formatScore(c.research)}</strong><span>Research</span></div><div class="metric"><strong>${formatScore(c.hostel)}</strong><span>Hostel</span></div></div>
+            <div class="chips">${streamChips}${subjectChips}${c.environment ? `<span class="chip">${safeText(c.environment)}</span>` : ''}</div>
+            <div class="card-footer"><button class="save-btn ${saved.has(String(c.id))?'saved':''}" data-save="${safeText(c.id)}" aria-pressed="${saved.has(String(c.id))}">${saved.has(String(c.id))?'✓ Saved':'＋ Save'}</button><button class="details-btn" data-details="${safeText(c.id)}">View profile ↗</button></div>
           </div>
-        </article>`).join('');
+        </article>`;
+      }).join('');
       $('emptyState').hidden = list.length > 0;
       $('collegeGrid').hidden = list.length === 0;
+      if (list.length === 0) {
+        $('emptyState').innerHTML = liveDirectory
+          ? '<strong>No matching institutions found.</strong>Try removing a filter or add the institution/programme data to the Campus Guide database.'
+          : '<strong>No matching preview profiles found.</strong>Try a different filter. In live mode, this explorer searches all records you add to the database.';
+      }
     }
-    ['searchInput','degreeFilter','subjectFilter','environmentFilter','hostelFilter','sortFilter'].forEach(id => $(id).addEventListener(id === 'searchInput' ? 'input' : 'change', renderColleges));
-    $('resetFilters').addEventListener('click', () => { $('searchInput').value=''; $('degreeFilter').value=''; $('subjectFilter').value=''; $('environmentFilter').value=''; $('hostelFilter').value=''; $('sortFilter').value='overall'; renderColleges(); });
+
+    // Filter and shortlist actions
+    ['searchInput','institutionTypeFilter','streamFilter','degreeFilter','subjectFilter','stateFilter','environmentFilter','hostelFilter','sortFilter'].forEach(id => $(id).addEventListener(id === 'searchInput' ? 'input' : 'change', renderColleges));
+    $('resetFilters').addEventListener('click', () => { ['searchInput','institutionTypeFilter','streamFilter','degreeFilter','subjectFilter','stateFilter','environmentFilter','hostelFilter'].forEach(id => $(id).value=''); $('sortFilter').value='overall'; renderColleges(); });
     $('collegeGrid').addEventListener('click', e => {
       const saveBtn = e.target.closest('[data-save]');
       if (saveBtn) {
-        const id = Number(saveBtn.dataset.save);
-        saved.has(id) ? saved.delete(id) : saved.add(id);
-        localStorage.setItem('cgSavedDemo', JSON.stringify([...saved]));
-        renderColleges();
-        showToast(saved.has(id) ? 'Demo profile saved to this browser.' : 'Demo profile removed from your shortlist.');
-        return;
+        const id = String(saveBtn.dataset.save);
+        if (saved.has(id)) saved.delete(id); else saved.add(id);
+        localStorage.setItem('campusGuideSaved', JSON.stringify([...saved]));
+        renderColleges(); showToast(saved.has(id) ? 'Institution saved to this browser.' : 'Institution removed from your shortlist.'); return;
       }
       const detailsBtn = e.target.closest('[data-details]');
       if (detailsBtn) {
-        const c = colleges.find(item => item.id === Number(detailsBtn.dataset.details));
-        showToast(`${c.name}: demo profile only. Add verified detail pages before public launch.`);
+        const c = colleges.find(item => String(item.id) === String(detailsBtn.dataset.details));
+        if (!c) return;
+        if (c.official_website) { showToast('Opening the official institution website in a new tab.'); window.open(c.official_website, '_blank', 'noopener,noreferrer'); }
+        else if (c.is_demo) showToast('Preview record only. Demo values are not verified college facts.');
+        else showToast(c.profile_status === 'published' ? `${c.name}: profile is loaded from the Campus Guide directory.` : `${c.name}: directory entry found; verified student insights have not been added yet.`);
       }
     });
 
-    function openModal(name) {
-      closeAllModals();
-      const id = name === 'login' || name === 'signup' ? 'loginModal' : name === 'feedback' ? 'feedbackModal' : 'mentorModal';
-      $(id).classList.add('open');
-      document.body.style.overflow = 'hidden';
-      if (name === 'signup') { $('authTitle').textContent = 'Create your student profile.'; $('authSubmit').textContent = 'Create demo account'; }
-      else if (name === 'login') { $('authTitle').textContent = 'Welcome to CareerGuide.'; $('authSubmit').textContent = 'Continue with email'; }
-      if (id === 'loginModal') $('authInput').focus();
-    }
-    function closeAllModals() { document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('open')); document.body.style.overflow = ''; }
+    // Modal navigation
     document.querySelectorAll('[data-open-modal]').forEach(btn => btn.addEventListener('click', () => openModal(btn.dataset.openModal)));
     document.querySelectorAll('[data-close-modal]').forEach(btn => btn.addEventListener('click', closeAllModals));
     document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.addEventListener('click', e => { if (e.target === backdrop) closeAllModals(); }));
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllModals(); });
+    document.querySelectorAll('[data-auth-mode]').forEach(btn => btn.addEventListener('click', () => setAuthMode(btn.dataset.authMode)));
+    document.querySelectorAll('[data-auth-tab]').forEach(btn => btn.addEventListener('click', () => setChannel(btn.dataset.authTab)));
     const mobileMenuBtn = $('mobileMenuBtn');
     mobileMenuBtn.addEventListener('click', () => { const nav = $('mobileNav'); const isOpen = nav.classList.toggle('open'); mobileMenuBtn.setAttribute('aria-expanded', String(isOpen)); mobileMenuBtn.textContent = isOpen ? '×' : '☰'; });
     $('mobileNav').querySelectorAll('a').forEach(a => a.addEventListener('click', () => { $('mobileNav').classList.remove('open'); mobileMenuBtn.setAttribute('aria-expanded','false'); mobileMenuBtn.textContent='☰'; }));
-    document.querySelectorAll('[data-auth-tab]').forEach(btn => btn.addEventListener('click', () => {
-      document.querySelectorAll('[data-auth-tab]').forEach(b=>b.classList.toggle('active', b===btn));
-      const phone = btn.dataset.authTab === 'phone';
-      $('authInputLabel').textContent = phone ? 'Phone number' : 'Email address';
-      $('authInput').type = phone ? 'tel' : 'email';
-      $('authInput').placeholder = phone ? '+91 98765 43210' : 'you@example.com';
-      $('authInput').autocomplete = phone ? 'tel' : 'email';
-      $('authInput').value = '';
-      $('authSubmit').textContent = phone ? 'Continue with phone (demo)' : 'Continue with email';
-      $('authMessage').classList.remove('show');
-    }));
-    $('authForm').addEventListener('submit', e => {
+
+    $('loginForm').addEventListener('submit', async e => {
       e.preventDefault();
-      const msg = $('authMessage');
-      msg.textContent = 'Demo only: no account, login, OTP or password was created or sent. Connect a secure authentication provider before launch.';
-      msg.classList.add('show');
-      $('authPassword').value = '';
+      if (!requireBackend('loginMessage')) return;
+      const contact = normalizeContact($('loginContact').value);
+      const password = $('loginPassword').value;
+      if (authChannel === 'phone' && !/^\+[1-9]\d{7,14}$/.test(contact)) { showMessage('loginMessage','Phone number must include country code, for example +919876543210.', true); return; }
+      showMessage('loginMessage','Signing in…');
+      try {
+        const credentials = authChannel === 'email' ? { email: contact, password } : { phone: contact, password };
+        const { data, error } = await supabase.auth.signInWithPassword(credentials);
+        if (error) throw error;
+        $('loginPassword').value = '';
+        await finishLogin(data.user);
+      } catch (error) { showMessage('loginMessage', error.message || 'Login failed. Check your contact and password.', true); }
     });
-    $('feedbackForm').addEventListener('submit', e => {
+
+    $('signupContactForm').addEventListener('submit', async e => {
       e.preventDefault();
-      const msg = $('feedbackMessage');
-      msg.textContent = 'Preview validated. Your review has NOT been saved, sent or published. Connect a database and moderation workflow before collecting real feedback.';
-      msg.classList.add('show');
+      if (!requireBackend('signupContactMessage')) return;
+      const contact = normalizeContact($('signupContact').value);
+      if (authChannel === 'phone' && !/^\+[1-9]\d{7,14}$/.test(contact)) { showMessage('signupContactMessage','Phone number must include country code, for example +919876543210.', true); return; }
+      if (authChannel === 'email' && !/^\S+@\S+\.\S+$/.test(contact)) { showMessage('signupContactMessage','Please enter a valid email address.', true); return; }
+      pendingContact = contact;
+      showMessage('signupContactMessage','Sending your verification code…');
+      try {
+        const payload = authChannel === 'email' ? { email: contact, options: { shouldCreateUser: true } } : { phone: contact, options: { shouldCreateUser: true } };
+        const { error } = await supabase.auth.signInWithOtp(payload);
+        if (error) throw error;
+        $('otpCode').value = '';
+        setAuthStep('otp');
+        showMessage('otpMessage', authChannel === 'email' ? `We sent a code to ${contact}. Enter it below.` : `We sent an SMS code to ${contact}. Enter it below.`);
+      } catch (error) { showMessage('signupContactMessage', error.message || 'Could not send the verification code. Check provider settings.', true); }
     });
-    $('mentorForm').addEventListener('submit', e => {
+
+    $('resendOtpBtn').addEventListener('click', async () => {
+      if (!supabase || !pendingContact) { showMessage('otpMessage','Start with your email or phone number again.', true); return; }
+      try {
+        const payload = authChannel === 'email' ? { email: pendingContact, options: { shouldCreateUser: true } } : { phone: pendingContact, options: { shouldCreateUser: true } };
+        const { error } = await supabase.auth.signInWithOtp(payload);
+        if (error) throw error;
+        showMessage('otpMessage','A new verification code was requested. Check your inbox or SMS.');
+      } catch (error) { showMessage('otpMessage', error.message || 'Could not resend the code.', true); }
+    });
+
+    $('otpForm').addEventListener('submit', async e => {
       e.preventDefault();
-      const msg = $('mentorMessage');
-      msg.textContent = 'Preview request checked. No personal details have been sent or stored. Connect a secure backend before accepting real mentorship requests.';
-      msg.classList.add('show');
+      if (!requireBackend('otpMessage')) return;
+      const token = $('otpCode').value.trim();
+      showMessage('otpMessage','Checking your verification code…');
+      try {
+        const payload = authChannel === 'email'
+          ? { email: pendingContact, token, type: 'email' }
+          : { phone: pendingContact, token, type: 'sms' };
+        const { data, error } = await supabase.auth.verifyOtp(payload);
+        if (error) throw error;
+        pendingOtpUser = data.user;
+        setAuthStep('password');
+        showToast('Contact verified. Now create your password.');
+      } catch (error) { showMessage('otpMessage', error.message || 'The code is invalid or expired. Request a new code.', true); }
     });
-    let toastTimer;
-    function showToast(message) { const toast = $('toast'); toast.textContent = message; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('show'), 3200); }
+
+    $('passwordForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      if (!requireBackend('passwordMessage')) return;
+      const password = $('newPassword').value;
+      const confirm = $('confirmPassword').value;
+      if (password.length < 8) { showMessage('passwordMessage','Use at least 8 characters for your password.', true); return; }
+      if (password !== confirm) { showMessage('passwordMessage','Passwords do not match. Please confirm again.', true); return; }
+      showMessage('passwordMessage','Saving your password securely…');
+      try {
+        const { data, error } = await supabase.auth.updateUser({ password });
+        if (error) throw error;
+        currentUser = data.user || pendingOtpUser;
+        $('newPassword').value = ''; $('confirmPassword').value = '';
+        const existingProfile = await loadProfile(currentUser?.id);
+        currentProfile = existingProfile;
+        fillProfileForm(existingProfile);
+        setAuthStep('profile');
+        if (existingProfile) showMessage('profileMessage','An existing student profile was found. Review the details and save to continue.');
+        updateNav();
+      } catch (error) { showMessage('passwordMessage', error.message || 'Could not save password. Please try again.', true); }
+    });
+
+    $('profileForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      if (!requireBackend('profileMessage')) return;
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) { showMessage('profileMessage','Your session is missing. Please verify your contact or log in again.', true); return; }
+      const profile = {
+        id: user.id,
+        full_name: $('profileName').value.trim(),
+        stream: $('profileStream').value,
+        current_qualification: $('profileQualification').value,
+        target_level: $('profileTargetLevel').value,
+        subject: $('profileSubject').value,
+        preferred_institution_type: $('profileInstituteType').value || null,
+        preferred_state: $('profileState').value || null,
+        current_institution: $('profileCurrentInstitute').value.trim() || null,
+        updated_at: new Date().toISOString()
+      };
+      showMessage('profileMessage','Saving your student profile…');
+      try {
+        const { data, error } = await supabase.from('profiles').upsert(profile).select().single();
+        if (error) throw error;
+        currentUser = user; currentProfile = data;
+        updateNav(); applyProfileFilters(data); closeAllModals();
+        showToast('Your Campus Guide profile is saved. College filters are personalised.');
+      } catch (error) { showMessage('profileMessage', `${error.message || 'Could not save profile.'} Make sure supabase-schema.sql has been run.`, true); }
+    });
+
+    $('logoutBtn').addEventListener('click', async () => {
+      if (!supabase) return;
+      const { error } = await supabase.auth.signOut();
+      if (error) { showToast(`Logout error: ${error.message}`); return; }
+      currentUser = null; currentProfile = null; pendingOtpUser = null; pendingContact = '';
+      updateNav();
+      ['institutionTypeFilter','streamFilter','degreeFilter','subjectFilter','stateFilter','environmentFilter','hostelFilter'].forEach(id => $(id).value='');
+      renderColleges(); showToast('You have logged out securely. Log in again with your contact and password.');
+    });
+
+    // Student feedback stays pending until the Campus Guide team moderates it.
+    $('feedbackForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      if (!currentUser) { showToast('Please log in before sending student feedback.'); setAuthMode('login'); showModal('loginModal'); return; }
+      if (!requireBackend('feedbackMessage')) return;
+      const feedback = {
+        user_id: currentUser.id,
+        institution_name: $('fbCollege').value.trim(),
+        program: $('fbProgram').value.trim(),
+        category: $('fbCategory').value,
+        rating: Number($('fbRating').value),
+        review: $('fbReview').value.trim()
+      };
+      try {
+        const { error } = await supabase.from('student_feedback').insert(feedback);
+        if (error) throw error;
+        $('feedbackForm').reset(); showMessage('feedbackMessage','Thank you. Your feedback was submitted for moderation and is not public until approved.');
+      } catch (error) { showMessage('feedbackMessage', `${error.message || 'Could not submit feedback.'} Check the database setup.`, true); }
+    });
+
+    $('mentorForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      if (!currentUser) { showToast('Please log in before requesting mentorship.'); setAuthMode('login'); showModal('loginModal'); return; }
+      if (!requireBackend('mentorMessage')) return;
+      const request = {
+        user_id: currentUser.id,
+        full_name: $('mentorName').value.trim() || currentProfile?.full_name || '',
+        contact: $('mentorContact').value.trim() || currentUser.email || currentUser.phone || '',
+        current_study_level: $('mentorLevel').value,
+        topic: $('mentorTopic').value,
+        help_description: $('mentorHelp').value.trim()
+      };
+      try {
+        const { error } = await supabase.from('mentorship_requests').insert(request);
+        if (error) throw error;
+        $('mentorForm').reset(); showMessage('mentorMessage','Your mentorship request has been received. The Campus Guide team can now review it.');
+      } catch (error) { showMessage('mentorMessage', `${error.message || 'Could not submit request.'} Check the database setup.`, true); }
+    });
+
+    // When a session is restored after refresh, keep the student logged in.
+    if (supabase) {
+      supabase.auth.onAuthStateChange((_event, session) => {
+        currentUser = session?.user || null;
+        if (!currentUser) currentProfile = null;
+        updateNav();
+      });
+      (async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          currentUser = session.user;
+          currentProfile = await loadProfile(currentUser.id);
+          updateNav();
+          if (currentProfile) applyProfileFilters(currentProfile);
+          else { setAuthMode('signup'); showModal('loginModal'); setAuthStep('profile'); fillProfileForm(null); }
+        }
+      })();
+      $('authConfigFootnote').textContent = 'Passwords are managed by Supabase Auth. Sessions persist securely in the browser; email/SMS delivery depends on your provider settings.';
+    } else {
+      $('authConfigFootnote').textContent = 'Preview mode: no OTP is sent and no real account can be created until Supabase is configured. Never enter a real password while testing the unconfigured preview.';
+    }
+
+    // Initialise
+    setChannel('email');
+    setAuthMode('login');
     $('year').textContent = new Date().getFullYear();
-    renderColleges();
+    updateNav();
+    loadDirectory();
   </script>
 </body>
 </html>
