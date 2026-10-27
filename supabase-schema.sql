@@ -99,3 +99,10 @@ create policy "Students can read their own mentorship requests" on public.mentor
 -- Tip: insert institutional directory records in Supabase Table Editor > institutions.
 -- Use institution_type: central_university, iit, or nit.
 -- Store streams/levels/subjects as PostgreSQL text arrays; leave score fields NULL until there is enough verified feedback.
+
+-- Explicit minimum Data API grants. RLS policies above continue to control which rows each role can access.
+grant select on table public.institutions to anon, authenticated;
+grant select, insert, update on table public.profiles to authenticated;
+grant select, insert on table public.student_feedback to authenticated;
+grant select on table public.student_feedback to anon;
+grant select, insert on table public.mentorship_requests to authenticated;
