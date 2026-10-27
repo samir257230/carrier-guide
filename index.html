@@ -408,7 +408,7 @@
     <section class="section mentor-section" id="mentorship">
       <div class="container mentor-grid">
         <div><div class="section-kicker">Learn from someone who's been there</div><h2>Good guidance can change your journey.</h2><p class="section-desc">Not sure which course to choose, how research works, or what campus life is really like? Connect with a peer mentor for practical, experience-based guidance.</p><div class="mentor-benefits"><div class="benefit"><b>✳</b> Subject & course clarity</div><div class="benefit"><b>✳</b> Research pathway guidance</div><div class="benefit"><b>✳</b> Application preparation</div><div class="benefit"><b>✳</b> Campus-life questions</div></div></div>
-        <div class="mentor-panel"><div class="panel-top"><div class="mentor-icon">✦</div><div><h3>Find your peer mentor</h3><div class="sub">A student-first guidance request</div></div></div><p>Tell us your study level and what you need help with. A verified account is required, and the request will be sent to the Campus Guide database when it is connected.</p><div class="field" style="margin:15px 0"><label for="mentorTopic">What would you like help with?</label><select id="mentorTopic"><option>Choosing a college or subject</option><option>Research opportunities</option><option>Applications and interviews</option><option>Hostel and campus life</option><option>General academic mentorship</option></select></div><button class="btn btn-primary" data-open-modal="mentor">Request mentorship <span aria-hidden="true">↗</span></button><p class="panel-note">Requests are stored for the Campus Guide team to review after the database is connected.</p></div>
+        <div class="mentor-panel"><div class="panel-top"><div class="mentor-icon">✦</div><div><h3>Find your peer mentor</h3><div class="sub">A student-first guidance request</div></div></div><p>Tell us your study level and what you need help with. A student account is required, and the request will be sent to the Campus Guide database when it is connected.</p><div class="field" style="margin:15px 0"><label for="mentorTopic">What would you like help with?</label><select id="mentorTopic"><option>Choosing a college or subject</option><option>Research opportunities</option><option>Applications and interviews</option><option>Hostel and campus life</option><option>General academic mentorship</option></select></div><button class="btn btn-primary" data-open-modal="mentor">Request mentorship <span aria-hidden="true">↗</span></button><p class="panel-note">Requests are stored for the Campus Guide team to review after the database is connected.</p></div>
       </div>
     </section>
 
@@ -426,7 +426,7 @@
       <div class="container"><div class="section-heading"><div><div class="section-kicker">A few important details</div><h2>Frequently asked questions</h2></div></div>
         <div class="faq-list">
           <details><summary>Are the college ratings on this page real?</summary><p>No. This starter website uses illustrative demo profiles only. Add actual college information after collecting and checking student feedback, and clearly show how each score is calculated.</p></details>
-          <details><summary>How will login with email or phone work?</summary><p>Email and phone verification, password setup and persistent sessions use Supabase Auth. They become active after the project URL, public key, email template and SMS provider are configured.</p></details>
+          <details><summary>How does student login work?</summary><p>Students create an account using an email address and password, then use the same credentials to log in. OTP and phone verification are not used in this starter version.</p></details>
           <details><summary>Can students submit anonymous feedback?</summary><p>You can design a privacy-conscious review policy that allows public anonymity while privately verifying student status. Explain what is collected, who can access it, and how reviews are moderated.</p></details>
           <details><summary>How will the college filters be updated?</summary><p>The live filters read records from the Campus Guide institutions table. The team can add or update institution information through the Supabase dashboard or an admin panel.</p></details>
         </div>
@@ -437,56 +437,38 @@
   </main>
 
   <footer>
-    <div class="container"><div class="footer-top"><div><a class="brand" href="#home"><img class="brand-logo" src="campus-guide-logo.jpeg" alt="Campus Guide logo" /><span>Campus <span>Guide</span></span></a><p class="footer-blurb">A student-first college discovery and peer mentorship platform for Indian central universities, IITs and NITs. Better information can help students make decisions that fit their goals.</p></div><div class="footer-links"><div class="footer-col"><strong>Explore</strong><a href="#explore">Find colleges</a><a href="#how-it-works">How it works</a><a href="#mentorship">Mentorship</a></div><div class="footer-col"><strong>Community</strong><a href="#feedback">Student feedback</a><a href="https://www.instagram.com/de_v_a_n_sh_/" target="_blank" rel="noopener noreferrer">Instagram ↗</a><a href="mailto:hello@campusguide.example">Contact (add your official email)</a></div></div></div><div class="footer-bottom"><span>© <span id="year"></span> Campus Guide. All rights reserved.</span><span>Preview website · Replace demo data and connect secure services before launch.</span></div></div>
+    <div class="container"><div class="footer-top"><div><a class="brand" href="#home"><img class="brand-logo" src="campus-guide-logo.jpeg" alt="Campus Guide logo" /><span>Campus <span>Guide</span></span></a><p class="footer-blurb">A student-first college discovery and peer mentorship platform for Indian central universities, IITs and NITs. Better information can help students make decisions that fit their goals.</p></div><div class="footer-links"><div class="footer-col"><strong>Explore</strong><a href="#explore">Find colleges</a><a href="#how-it-works">How it works</a><a href="#mentorship">Mentorship</a></div><div class="footer-col"><strong>Community</strong><a href="#feedback">Student feedback</a><a href="https://www.instagram.com/de_v_a_n_sh_/" target="_blank" rel="noopener noreferrer">Instagram ↗</a><a href="mailto:hello@campusguide.example">Contact (add your official email)</a></div></div></div><div class="footer-bottom"><span>© <span id="year"></span> Campus Guide. All rights reserved.</span><span>Campus Guide · Student college discovery and mentorship.</span></div></div>
   </footer>
 
-  <!-- Campus Guide account workflow. Requires Supabase configuration to send real OTPs. -->
+  <!-- Campus Guide account workflow: email + password only; no OTP. -->
   <div class="modal-backdrop" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
     <div class="modal">
       <button class="modal-close" data-close-modal aria-label="Close">×</button>
       <div class="section-kicker">Your student journey</div>
       <h2 id="authTitle">Welcome to Campus Guide.</h2>
-      <p class="modal-intro" id="authIntro">Create a verified account or sign in to save your academic preferences.</p>
+      <p class="modal-intro" id="authIntro">Log in with your registered email address and password.</p>
       <div class="modal-tabs" id="authModeTabs">
         <button type="button" class="active" data-auth-mode="login">Log in</button>
         <button type="button" data-auth-mode="signup">Create account</button>
       </div>
-      <div class="modal-tabs" id="authChannelTabs">
-        <button type="button" class="active" data-auth-tab="email">Email</button>
-        <button type="button" data-auth-tab="phone">Phone</button>
-      </div>
       <div id="authStepLogin">
         <form id="loginForm" class="modal-form">
-          <div class="field"><label for="loginContact" id="loginContactLabel">Email address</label><input id="loginContact" type="email" placeholder="you@example.com" required autocomplete="username" /></div>
+          <div class="field"><label for="loginContact">Email address (login ID)</label><input id="loginContact" type="email" placeholder="you@example.com" required autocomplete="username" /></div>
           <div class="field"><label for="loginPassword">Password</label><input id="loginPassword" type="password" placeholder="Enter your password" required minlength="8" autocomplete="current-password" /></div>
-          <button class="btn btn-primary" type="submit" id="loginSubmit">Log in with email</button>
+          <button class="btn btn-primary" type="submit" id="loginSubmit">Log in</button>
           <div class="form-message" id="loginMessage" role="status"></div>
         </form>
-        <p class="modal-footnote">Use the email address or phone number you verified when creating your account.</p>
+        <p class="modal-footnote">Use the email address and password you registered with.</p>
       </div>
       <div id="authStepSignupContact" hidden>
         <form id="signupContactForm" class="modal-form">
-          <div class="field"><label for="signupContact" id="signupContactLabel">Email address</label><input id="signupContact" type="email" placeholder="you@example.com" required autocomplete="email" /></div>
-          <button class="btn btn-primary" type="submit" id="sendOtpBtn">Send verification code</button>
+          <div class="field"><label for="signupContact">Email address (login ID)</label><input id="signupContact" type="email" placeholder="you@example.com" required autocomplete="email" /></div>
+          <div class="field"><label for="signupPassword">Create password</label><input id="signupPassword" type="password" placeholder="At least 8 characters" required minlength="8" autocomplete="new-password" /></div>
+          <div class="field"><label for="signupConfirmPassword">Confirm password</label><input id="signupConfirmPassword" type="password" placeholder="Enter the same password again" required minlength="8" autocomplete="new-password" /></div>
+          <button class="btn btn-primary" type="submit" id="createAccountBtn">Create account</button>
           <div class="form-message" id="signupContactMessage" role="status"></div>
         </form>
-        <p class="modal-footnote">For phone verification, use the international format, such as +91XXXXXXXXXX. SMS delivery requires a configured SMS provider.</p>
-      </div>
-      <div id="authStepOtp" hidden>
-        <form id="otpForm" class="modal-form">
-          <div class="field"><label for="otpCode">Verification code</label><input id="otpCode" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,8}" minlength="6" maxlength="8" placeholder="Enter the code you received" required /></div>
-          <button class="btn btn-primary" type="submit">Verify code</button>
-          <button class="btn btn-outline" id="resendOtpBtn" type="button">Resend code</button>
-          <div class="form-message" id="otpMessage" role="status"></div>
-        </form>
-      </div>
-      <div id="authStepPassword" hidden>
-        <form id="passwordForm" class="modal-form">
-          <div class="field"><label for="newPassword">Create password</label><input id="newPassword" type="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters" required /></div>
-          <div class="field"><label for="confirmPassword">Confirm password</label><input id="confirmPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Enter the same password again" required /></div>
-          <button class="btn btn-primary" type="submit">Save password and continue</button>
-          <div class="form-message" id="passwordMessage" role="status"></div>
-        </form>
+        <p class="modal-footnote">No OTP is used. For immediate login after registration, turn OFF “Confirm email” in Supabase → Authentication → Sign In / Providers.</p>
       </div>
       <div id="authStepProfile" hidden>
         <form id="profileForm" class="modal-form">
@@ -504,7 +486,7 @@
         <p class="modal-footnote">These details personalise the filters. Only share information needed to guide your education choices.</p>
       </div>
       <div class="form-message error" id="authGlobalMessage" role="status"></div>
-      <p class="modal-footnote" id="authConfigFootnote">Account verification becomes active after connecting Supabase and configuring its email / SMS delivery settings. The site never stores passwords in browser storage.</p>
+      <p class="modal-footnote" id="authConfigFootnote">Sign in with email and password. Passwords are securely managed by Supabase Auth.</p>
     </div>
   </div>
 
@@ -550,9 +532,6 @@
     let currentUser = null;
     let currentProfile = null;
     let authMode = 'login';
-    let authChannel = 'email';
-    let pendingContact = '';
-    let pendingOtpUser = null;
     let toastTimer;
 
     function showMessage(id, message, isError = false) {
@@ -562,7 +541,7 @@
       el.classList.toggle('error', Boolean(isError));
     }
     function clearAuthMessages() {
-      ['loginMessage','signupContactMessage','otpMessage','passwordMessage','profileMessage','authGlobalMessage'].forEach(id => showMessage(id, ''));
+      ['loginMessage','signupContactMessage','profileMessage','authGlobalMessage'].forEach(id => showMessage(id, ''));
     }
     function showToast(message) {
       const toast = $('toast'); toast.textContent = message; toast.classList.add('show');
@@ -572,7 +551,7 @@
     function showModal(id) { closeAllModals(); $(id).classList.add('open'); document.body.style.overflow = 'hidden'; }
     function openModal(name) {
       if (name === 'feedback' || name === 'mentor') {
-        if (!currentUser) { setAuthMode('signup'); showModal('loginModal'); showToast('Please create a verified account or log in first.'); return; }
+        if (!currentUser) { setAuthMode('signup'); showModal('loginModal'); showToast('Please create an account or log in first.'); return; }
         if (name === 'feedback' && currentProfile?.current_institution) $('fbCollege').value = currentProfile.current_institution;
       }
       if (name === 'login' || name === 'signup') {
@@ -589,40 +568,19 @@
       authMode = mode;
       clearAuthMessages();
       $('authTitle').textContent = mode === 'signup' ? 'Create your Campus Guide account.' : 'Welcome back to Campus Guide.';
-      $('authIntro').textContent = mode === 'signup' ? 'Verify your email or phone, set a password, then build your student profile.' : 'Log in with your verified email or phone number and password.';
+      $('authIntro').textContent = mode === 'signup' ? 'Create an account using your email address and password.' : 'Log in with your registered email address and password.';
       document.querySelectorAll('[data-auth-mode]').forEach(btn => btn.classList.toggle('active', btn.dataset.authMode === mode));
       setAuthStep(mode === 'signup' ? 'signupContact' : 'login');
     }
     function setAuthStep(step) {
-      ['Login','SignupContact','Otp','Password','Profile'].forEach(name => { const el = $('authStep' + name); if (el) el.hidden = name.toLowerCase() !== step.toLowerCase(); });
-      const showTabs = step === 'login' || step === 'signupContact';
-      $('authModeTabs').hidden = !showTabs;
-      $('authChannelTabs').hidden = !showTabs;
+      ['Login','SignupContact','Profile'].forEach(name => { const el = $('authStep' + name); if (el) el.hidden = name.toLowerCase() !== step.toLowerCase(); });
+      $('authModeTabs').hidden = !(step === 'login' || step === 'signupContact');
       clearAuthMessages();
     }
-    function setChannel(channel) {
-      authChannel = channel;
-      document.querySelectorAll('[data-auth-tab]').forEach(btn => btn.classList.toggle('active', btn.dataset.authTab === channel));
-      const isPhone = channel === 'phone';
-      for (const [id, labelId] of [['loginContact','loginContactLabel'], ['signupContact','signupContactLabel']]) {
-        $(id).type = isPhone ? 'tel' : 'email';
-        $(id).placeholder = isPhone ? '+91 98765 43210' : 'you@example.com';
-        $(id).autocomplete = isPhone ? 'tel' : (id === 'loginContact' ? 'username' : 'email');
-        $(labelId).textContent = isPhone ? 'Phone number (with country code)' : 'Email address';
-      }
-      $('loginSubmit').textContent = isPhone ? 'Log in with phone' : 'Log in with email';
-      $('sendOtpBtn').textContent = isPhone ? 'Send SMS verification code' : 'Send email verification code';
-      clearAuthMessages();
-    }
-    function normalizeContact(value) {
-      const v = String(value || '').trim();
-      if (authChannel === 'email') return v.toLowerCase();
-      return v.replace(/[\s()-]/g, '');
-    }
-    function contactPayload(contact) { return authChannel === 'email' ? { email: contact } : { phone: contact }; }
+    function normalizeContact(value) { return String(value || '').trim().toLowerCase(); }
     function requireBackend(messageId) {
       if (supabase) return true;
-      showMessage(messageId, 'Abhi authentication/database connected nahi hai. ZIP ke README mein Supabase setup ke steps follow karo; phir OTP, password aur profile features active honge.', true);
+      showMessage(messageId, 'Campus Guide abhi Supabase se connect nahi hai. Apni repository ke supabase-config.js mein project URL aur Publishable Key check karo.', true);
       return false;
     }
     function updateNav() {
@@ -786,99 +744,69 @@
     document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.addEventListener('click', e => { if (e.target === backdrop) closeAllModals(); }));
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllModals(); });
     document.querySelectorAll('[data-auth-mode]').forEach(btn => btn.addEventListener('click', () => setAuthMode(btn.dataset.authMode)));
-    document.querySelectorAll('[data-auth-tab]').forEach(btn => btn.addEventListener('click', () => setChannel(btn.dataset.authTab)));
     const mobileMenuBtn = $('mobileMenuBtn');
     mobileMenuBtn.addEventListener('click', () => { const nav = $('mobileNav'); const isOpen = nav.classList.toggle('open'); mobileMenuBtn.setAttribute('aria-expanded', String(isOpen)); mobileMenuBtn.textContent = isOpen ? '×' : '☰'; });
     $('mobileNav').querySelectorAll('a').forEach(a => a.addEventListener('click', () => { $('mobileNav').classList.remove('open'); mobileMenuBtn.setAttribute('aria-expanded','false'); mobileMenuBtn.textContent='☰'; }));
 
+    // Password-only account flow. No OTP or SMS is requested.
     $('loginForm').addEventListener('submit', async e => {
       e.preventDefault();
       if (!requireBackend('loginMessage')) return;
-      const contact = normalizeContact($('loginContact').value);
+      const email = normalizeContact($('loginContact').value);
       const password = $('loginPassword').value;
-      if (authChannel === 'phone' && !/^\+[1-9]\d{7,14}$/.test(contact)) { showMessage('loginMessage','Phone number must include country code, for example +919876543210.', true); return; }
-      showMessage('loginMessage','Signing in…');
+      showMessage('loginMessage', 'Signing in…');
       try {
-        const credentials = authChannel === 'email' ? { email: contact, password } : { phone: contact, password };
-        const { data, error } = await supabase.auth.signInWithPassword(credentials);
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         $('loginPassword').value = '';
         await finishLogin(data.user);
-      } catch (error) { showMessage('loginMessage', error.message || 'Login failed. Check your contact and password.', true); }
+      } catch (error) {
+        showMessage('loginMessage', error.message || 'Login failed. Check your email and password.', true);
+      }
     });
 
     $('signupContactForm').addEventListener('submit', async e => {
       e.preventDefault();
       if (!requireBackend('signupContactMessage')) return;
-      const contact = normalizeContact($('signupContact').value);
-      if (authChannel === 'phone' && !/^\+[1-9]\d{7,14}$/.test(contact)) { showMessage('signupContactMessage','Phone number must include country code, for example +919876543210.', true); return; }
-      if (authChannel === 'email' && !/^\S+@\S+\.\S+$/.test(contact)) { showMessage('signupContactMessage','Please enter a valid email address.', true); return; }
-      pendingContact = contact;
-      showMessage('signupContactMessage','Sending your verification code…');
+      const email = normalizeContact($('signupContact').value);
+      const password = $('signupPassword').value;
+      const confirmPassword = $('signupConfirmPassword').value;
+      if (!/^\S+@\S+\.\S+$/.test(email)) {
+        showMessage('signupContactMessage', 'Please enter a valid email address.', true);
+        return;
+      }
+      if (password.length < 8) {
+        showMessage('signupContactMessage', 'Use a password with at least 8 characters.', true);
+        return;
+      }
+      if (password !== confirmPassword) {
+        showMessage('signupContactMessage', 'Passwords do not match. Please try again.', true);
+        return;
+      }
+      showMessage('signupContactMessage', 'Creating your account…');
+      $('createAccountBtn').disabled = true;
       try {
-        const payload = authChannel === 'email' ? { email: contact, options: { shouldCreateUser: true } } : { phone: contact, options: { shouldCreateUser: true } };
-        const { error } = await supabase.auth.signInWithOtp(payload);
+        const { data, error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
-        $('otpCode').value = '';
-        setAuthStep('otp');
-        showMessage('otpMessage', authChannel === 'email' ? `We sent a code to ${contact}. Enter it below.` : `We sent an SMS code to ${contact}. Enter it below.`);
-      } catch (error) { showMessage('signupContactMessage', error.message || 'Could not send the verification code. Check provider settings.', true); }
-    });
-
-    $('resendOtpBtn').addEventListener('click', async () => {
-      if (!supabase || !pendingContact) { showMessage('otpMessage','Start with your email or phone number again.', true); return; }
-      try {
-        const payload = authChannel === 'email' ? { email: pendingContact, options: { shouldCreateUser: true } } : { phone: pendingContact, options: { shouldCreateUser: true } };
-        const { error } = await supabase.auth.signInWithOtp(payload);
-        if (error) throw error;
-        showMessage('otpMessage','A new verification code was requested. Check your inbox or SMS.');
-      } catch (error) { showMessage('otpMessage', error.message || 'Could not resend the code.', true); }
-    });
-
-    $('otpForm').addEventListener('submit', async e => {
-      e.preventDefault();
-      if (!requireBackend('otpMessage')) return;
-      const token = $('otpCode').value.trim();
-      showMessage('otpMessage','Checking your verification code…');
-      try {
-        const payload = authChannel === 'email'
-          ? { email: pendingContact, token, type: 'email' }
-          : { phone: pendingContact, token, type: 'sms' };
-        const { data, error } = await supabase.auth.verifyOtp(payload);
-        if (error) throw error;
-        pendingOtpUser = data.user;
-        setAuthStep('password');
-        showToast('Contact verified. Now create your password.');
-      } catch (error) { showMessage('otpMessage', error.message || 'The code is invalid or expired. Request a new code.', true); }
-    });
-
-    $('passwordForm').addEventListener('submit', async e => {
-      e.preventDefault();
-      if (!requireBackend('passwordMessage')) return;
-      const password = $('newPassword').value;
-      const confirm = $('confirmPassword').value;
-      if (password.length < 8) { showMessage('passwordMessage','Use at least 8 characters for your password.', true); return; }
-      if (password !== confirm) { showMessage('passwordMessage','Passwords do not match. Please confirm again.', true); return; }
-      showMessage('passwordMessage','Saving your password securely…');
-      try {
-        const { data, error } = await supabase.auth.updateUser({ password });
-        if (error) throw error;
-        currentUser = data.user || pendingOtpUser;
-        $('newPassword').value = ''; $('confirmPassword').value = '';
-        const existingProfile = await loadProfile(currentUser?.id);
-        currentProfile = existingProfile;
-        fillProfileForm(existingProfile);
-        setAuthStep('profile');
-        if (existingProfile) showMessage('profileMessage','An existing student profile was found. Review the details and save to continue.');
-        updateNav();
-      } catch (error) { showMessage('passwordMessage', error.message || 'Could not save password. Please try again.', true); }
+        $('signupPassword').value = '';
+        $('signupConfirmPassword').value = '';
+        if (data.session && data.user) {
+          await finishLogin(data.user);
+        } else {
+          showMessage('signupContactMessage', 'Account request received, but Supabase is still asking for email confirmation. To use password-only registration, turn OFF Confirm email in Supabase → Authentication → Sign In / Providers, save, and try again. If this email was already registered, use Log in instead.');
+        }
+      } catch (error) {
+        showMessage('signupContactMessage', error.message || 'Could not create account. If you already registered, try logging in.', true);
+      } finally {
+        $('createAccountBtn').disabled = false;
+      }
     });
 
     $('profileForm').addEventListener('submit', async e => {
       e.preventDefault();
       if (!requireBackend('profileMessage')) return;
       const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError || !user) { showMessage('profileMessage','Your session is missing. Please verify your contact or log in again.', true); return; }
+      if (userError || !user) { showMessage('profileMessage','Your session is missing. Please log in again.', true); return; }
       const profile = {
         id: user.id,
         full_name: $('profileName').value.trim(),
@@ -905,10 +833,10 @@
       if (!supabase) return;
       const { error } = await supabase.auth.signOut();
       if (error) { showToast(`Logout error: ${error.message}`); return; }
-      currentUser = null; currentProfile = null; pendingOtpUser = null; pendingContact = '';
+      currentUser = null; currentProfile = null;
       updateNav();
       ['institutionTypeFilter','streamFilter','degreeFilter','subjectFilter','stateFilter','environmentFilter','hostelFilter'].forEach(id => $(id).value='');
-      renderColleges(); showToast('You have logged out securely. Log in again with your contact and password.');
+      renderColleges(); showToast('You have logged out securely. Log in again with your email and password.');
     });
 
     // Student feedback stays pending until the Campus Guide team moderates it.
@@ -967,13 +895,12 @@
           else { setAuthMode('signup'); showModal('loginModal'); setAuthStep('profile'); fillProfileForm(null); }
         }
       })();
-      $('authConfigFootnote').textContent = 'Passwords are managed by Supabase Auth. Sessions persist securely in the browser; email/SMS delivery depends on your provider settings.';
+      $('authConfigFootnote').textContent = 'Email + password login is enabled. Supabase manages passwords and persistent sessions; no OTP is used.';
     } else {
-      $('authConfigFootnote').textContent = 'Preview mode: no OTP is sent and no real account can be created until Supabase is configured. Never enter a real password while testing the unconfigured preview.';
+      $('authConfigFootnote').textContent = 'Supabase is not configured, so account creation and login will not work yet. Keep the project URL and Publishable Key in supabase-config.js.';
     }
 
     // Initialise
-    setChannel('email');
     setAuthMode('login');
     $('year').textContent = new Date().getFullYear();
     updateNav();
